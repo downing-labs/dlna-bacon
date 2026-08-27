@@ -16,27 +16,28 @@
 # USA.
 
 AM_CFLAGS = -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+AM_CPPFLAGS = -I$(top_srcdir)/src
 
 # po/ (gettext translations) intentionally not built -- see configure.ac
 
 sbin_PROGRAMS = minidlnad
-minidlnad_SOURCES = minidlna.c upnphttp.c upnpdescgen.c upnpsoap.c \
-			upnpreplyparse.c minixml.c clients.c \
-			getifaddr.c process.c upnpglobalvars.c \
-			options.c minissdp.c uuid.c upnpevents.c \
-			sql.c utils.c metadata.c scanner.c monitor.c \
-			tivo_utils.c tivo_beacon.c tivo_commands.c \
-			playlist.c image_utils.c albumart.c log.c \
-			containers.c avahi.c webui.c tagutils/tagutils.c
+minidlnad_SOURCES = src/minidlna.c src/upnphttp.c src/upnpdescgen.c src/upnpsoap.c \
+			src/upnpreplyparse.c src/minixml.c src/clients.c \
+			src/getifaddr.c src/process.c src/upnpglobalvars.c \
+			src/options.c src/minissdp.c src/uuid.c src/upnpevents.c \
+			src/sql.c src/utils.c src/metadata.c src/scanner.c src/monitor.c \
+			src/tivo_utils.c src/tivo_beacon.c src/tivo_commands.c \
+			src/playlist.c src/image_utils.c src/albumart.c src/log.c \
+			src/containers.c src/avahi.c src/webui.c src/tagutils/tagutils.c
 
 if HAVE_KQUEUE
-minidlnad_SOURCES += kqueue.c monitor_kqueue.c
+minidlnad_SOURCES += src/kqueue.c src/monitor_kqueue.c
 else
-minidlnad_SOURCES += select.c
+minidlnad_SOURCES += src/select.c
 endif
 
 if HAVE_INOTIFY
-minidlnad_SOURCES += monitor_inotify.c
+minidlnad_SOURCES += src/monitor_inotify.c
 endif
 
 if HAVE_VORBISFILE
@@ -67,10 +68,10 @@ SUFFIXES = .tmpl .
 	sed -e s@:SBINDIR:@${sbindir}@ <$< >$@
 
 GENERATED_FILES = \
-	linux/minidlna.init.d.script
+	src/linux/minidlna.init.d.script
 
 TEMPLATES = \
-	linux/minidlna.init.d.script.tmpl
+	src/linux/minidlna.init.d.script.tmpl
 
 CLEANFILES = $(GENERATED_FILES)
 

@@ -93,12 +93,14 @@ Same convention as [vladgh/minidlna](https://github.com/vladgh/minidlna), so an 
 
 ## Architecture note (for future upstream rebases)
 
-The status page and rescan logic live entirely in `webui.c`/`webui.h`, new files not present upstream. The only changes to upstream's `upnphttp.c` are:
+The status page and rescan logic live entirely in `src/webui.c`/`src/webui.h`, new files not present upstream. The only changes to upstream's `src/upnphttp.c` are:
 1. `#include "webui.h"`
 2. `SendResp_presentation()`'s body replaced with a single call to `webui_send_status()`
 3. One new `else if` in the URL routing chain for `/rescan`
 
-The rescan-without-restart mechanism itself touches `minidlna.c`, `monitor_inotify.c`, `process.c`, and `upnpglobalvars.c`/`.h` -- see those files' diffs against upstream for the specific hunks if rebasing onto a newer release. As of this writing, upstream releases roughly once a year and the touched functions haven't changed significantly in several releases.
+The rescan-without-restart mechanism itself touches `src/minidlna.c`, `src/monitor_inotify.c`, `src/process.c`, and `src/upnpglobalvars.c`/`.h` -- see those files' diffs against upstream for the specific hunks if rebasing onto a newer release. As of this writing, upstream releases roughly once a year and the touched functions haven't changed significantly in several releases.
+
+All application source lives under `src/` (upstream's own layout keeps it flat at the project root; this fork moved it into a subdirectory so the repo root reads as a normal project -- `Dockerfile`, `README`, `configure.ac` -- rather than a C source dump).
 
 Gettext/`po/` translation support and the `AM_ICONV` macro were intentionally removed from the build (see comments in `configure.ac`) -- a long-standing upstream autotools/gettext interaction bug breaks `po/Makefile.in.in` regeneration when building from a raw git checkout with modern gettext, and translated UI strings aren't a goal for this fork.
 
