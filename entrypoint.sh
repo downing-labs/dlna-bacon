@@ -39,6 +39,15 @@ echo "port=${MINIDLNA_PORT:-8200}" >> "$CONF"
 echo "db_dir=/minidlna/cache" >> "$CONF"
 echo "log_dir=/minidlna/cache" >> "$CONF"
 echo "inotify=${MINIDLNA_INOTIFY:-yes}" >> "$CONF"
+# Deliberately overrides minidlnad's own default: passing -S (below,
+# instead of -d) to stay in the foreground avoids minidlnad's built-in
+# behavior of forcing every log category to maxdebug -- which dumps
+# full HTTP request/response bodies (headers, cookies, etc.) into the
+# container's logs. This is the sane default; override via
+# MINIDLNA_LOG_LEVEL if you actually need verbose output to debug
+# something (e.g. "general,artwork,database,inotify,scanner,metadata,
+# http,ssdp,tivo=debug").
+echo "log_level=${MINIDLNA_LOG_LEVEL:-general,artwork,database,inotify,scanner,metadata,http,ssdp,tivo=warn}" >> "$CONF"
 
 if [ -n "$MINIDLNA_NETWORK_INTERFACE" ]; then
 	echo "network_interface=$MINIDLNA_NETWORK_INTERFACE" >> "$CONF"
@@ -67,4 +76,4 @@ echo "album_art_names=Cover.jpg/cover.jpg/AlbumArtSmall.jpg/albumartsmall.jpg/Al
 
 chown -R minidlna:minidlna /minidlna/cache
 
-exec su-exec minidlna minidlnad -d -f "$CONF" -P /minidlna/cache/minidlna.pid
+exec su-exec minidlna minidlnad -S -f "$CONF" -P /minidlna/cache/minidlna.pid
