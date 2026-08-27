@@ -107,7 +107,7 @@ webui_write_head(struct string_s *str)
 	strcatf(str,
 		"body{background:var(--pg);color:var(--tx);"
 		"font-family:-apple-system,'Segoe UI',sans-serif;margin:0;"
-		"padding:1.5rem 2.5rem;}"
+		"padding:1.5rem 10%%;}"
 		".seg{display:flex;border:1px solid var(--bd);border-radius:8px;"
 		"overflow:hidden;}"
 		".seg button{border:none;background:var(--sf);color:var(--tx2);"
