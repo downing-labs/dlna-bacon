@@ -80,9 +80,9 @@ Same convention as [vladgh/minidlna](https://github.com/vladgh/minidlna), so an 
 | `MINIDLNA_FRIENDLY_NAME` | unset | Name shown to DLNA clients |
 | `MINIDLNA_NOTIFY_INTERVAL` | unset | Seconds between SSDP announces |
 | `MINIDLNA_INOTIFY` | `yes` | Live filesystem watching (`yes`/`no`) |
-| `MINIDLNA_NETWORK_INTERFACE` | unset (all interfaces) | Bind to a specific interface, e.g. `eth0` |
+| `MINIDLNA_NETWORK_INTERFACE` | unset | Bind to a specific interface, e.g. `eth0`. If unset, binds all interfaces |
 | `MINIDLNA_ROOT_CONTAINER` | unset | Restrict the DLNA root container (e.g. `B` for Browse Directory) |
-| `MINIDLNA_LOG_LEVEL` | `general,artwork,database,inotify,scanner,metadata,http,ssdp,tivo=warn` | Log verbosity per category. Raise to `=debug` or `=maxdebug` for troubleshooting -- note `maxdebug` on the `http` category logs full request/response bodies, cookies included, so only turn it up when you actually need it |
+| `MINIDLNA_LOG_LEVEL` | `warn` (all categories) | Full default is `general,artwork,database,inotify,scanner,metadata,http,ssdp,tivo=warn`. Raise a category to `=debug` or `=maxdebug` for troubleshooting -- note `maxdebug` on `http` logs full request/response bodies, cookies included, so only turn it up when you actually need it |
 | `MINIDLNA_MEDIA_DIR`, `MINIDLNA_MEDIA_DIR_1`, `MINIDLNA_MEDIA_DIR_N`, ... | -- | One or more media directories. Bare path, or `TYPE,path` (`A`/`V`/`P`) to restrict by type |
 
 ## How the rescan feature works
