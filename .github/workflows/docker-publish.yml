@@ -14,9 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  # GitHub Container Registry
   GHCR_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/dlna-bacon
-  # Docker Hub
   DOCKERHUB_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/dlna-bacon
 
 jobs:
