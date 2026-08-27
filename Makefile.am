@@ -20,7 +20,6 @@ AM_CFLAGS = -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 # po/ (gettext translations) intentionally not built -- see configure.ac
 
 sbin_PROGRAMS = minidlnad
-check_PROGRAMS = testupnpdescgen
 minidlnad_SOURCES = minidlna.c upnphttp.c upnpdescgen.c upnpsoap.c \
 			upnpreplyparse.c minixml.c clients.c \
 			getifaddr.c process.c upnpglobalvars.c \
@@ -62,16 +61,6 @@ minidlnad_LDADD = \
 	@LIBEXIF_LIBS@ \
 	-lFLAC $(flacogglibs) $(vorbislibs) $(avahilibs)
 
-testupnpdescgen_SOURCES = testupnpdescgen.c upnpdescgen.c
-testupnpdescgen_LDADD = \
-	@LIBJPEG_LIBS@ \
-	@LIBID3TAG_LIBS@ \
-	@LIBSQLITE3_LIBS@ \
-	@LIBAVFORMAT_LIBS@ \
-	@LIBAVUTIL_LIBS@ \
-	@LIBEXIF_LIBS@ \
-	-lFLAC $(flacogglibs) $(vorbislibs) $(avahilibs)
-
 SUFFIXES = .tmpl .
 
 .tmpl:
@@ -85,7 +74,5 @@ TEMPLATES = \
 
 CLEANFILES = $(GENERATED_FILES)
 
-ACLOCAL_AMFLAGS = -I m4
-
-EXTRA_DIST = m4/ChangeLog $(TEMPLATES)
+EXTRA_DIST = $(TEMPLATES)
 noinst_DATA = $(GENERATED_FILES)

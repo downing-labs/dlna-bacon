@@ -1,9 +1,10 @@
 # DLNA Bacon
 
-A fork of [ReadyMedia (formerly MiniDLNA)](https://sourceforge.net/projects/minidlna/) — a lightweight DLNA/UPnP-AV media server — with two additions:
+A fork of [ReadyMedia (formerly MiniDLNA)](https://sourceforge.net/projects/minidlna/) — a lightweight DLNA/UPnP-AV media server — with three additions:
 
 1. **Rescan without restart.** Stock minidlna can only rescan its media library at startup; picking up newly-added files otherwise means stopping and starting the whole server. This fork adds a signal-driven rescan (`SIGUSR2` / `minidlnad -U`) that the running daemon can act on live, with no interruption to playback or DLNA discovery.
-2. **A rebuilt status page.** The stock status page is a bare, unstyled HTML table. This fork replaces it with a small dashboard: library stats, a "Rescan library" button wired to the feature above, a connected-clients table, and light/dark/system theme support.
+2. **A rebuilt status page.** The stock status page is a bare, unstyled HTML table. This fork replaces it with a small dashboard: library stats, a "Rescan library" button wired to the feature above, and a connected-clients table showing whether each client currently has an active connection and whether it's on your main network or reachable cross-network (e.g. a different VLAN or the container's own bridge network) — plus light/dark/system theme support. The page polls itself adaptively: every 1.5s while a scan is running so it catches completion without a manual refresh, settling to a background check every 15s once idle.
+3. **Quieter, safer logging.** Stock minidlna's normal way of staying in the foreground for a container (`-d`) has a side effect: it force-escalates every log category to maximum verbosity, which dumps full HTTP request/response bodies — including any cookies or auth tokens a browser happens to send — straight into the container's logs. This fork runs in foreground via `-S` instead, which avoids that entirely, with a sane `warn`-level default and a `MINIDLNA_LOG_LEVEL` override if you ever want the verbose output back for troubleshooting.
 
 Built for a homelab setup where new media gets added often and waiting on a container restart to see it got old fast.
 
@@ -81,6 +82,7 @@ Same convention as [vladgh/minidlna](https://github.com/vladgh/minidlna), so an 
 | `MINIDLNA_INOTIFY` | `yes` | Live filesystem watching (`yes`/`no`) |
 | `MINIDLNA_NETWORK_INTERFACE` | unset (all interfaces) | Bind to a specific interface, e.g. `eth0` |
 | `MINIDLNA_ROOT_CONTAINER` | unset | Restrict the DLNA root container (e.g. `B` for Browse Directory) |
+| `MINIDLNA_LOG_LEVEL` | `general,artwork,database,inotify,scanner,metadata,http,ssdp,tivo=warn` | Log verbosity per category. Raise to `=debug` or `=maxdebug` for troubleshooting -- note `maxdebug` on the `http` category logs full request/response bodies, cookies included, so only turn it up when you actually need it |
 | `MINIDLNA_MEDIA_DIR`, `MINIDLNA_MEDIA_DIR_1`, `MINIDLNA_MEDIA_DIR_N`, ... | -- | One or more media directories. Bare path, or `TYPE,path` (`A`/`V`/`P`) to restrict by type |
 
 ## How the rescan feature works
