@@ -130,7 +130,7 @@ webui_send_status(struct upnphttp * h)
 {
 	struct string_s str;
 	char *body;
-	int a, v, p, f, i;
+	int a, v, p, f, i, scanning;
 	time_t last_scan;
 
 	body = malloc(WEBUI_BODY_SIZE);
@@ -150,6 +150,7 @@ webui_send_status(struct upnphttp * h)
 	p = sql_get_int_field(db, "SELECT count(*) from DETAILS where MIME glob 'i*'");
 	f = sql_get_int_field(db, "SELECT count(*) from OBJECTS where CLASS glob 'container.storageFolder*'");
 	last_scan = webui_last_scan_time();
+	scanning = GETFLAG(SCANNING_MASK) || GETFLAG(RESCAN_MASK);
 
 	webui_write_head(&str);
 
@@ -196,8 +197,7 @@ webui_send_status(struct upnphttp * h)
 		"border:none;border-radius:8px;padding:10px 18px;font-size:14px;"
 		"font-weight:500;cursor:pointer;\" onclick=\"triggerRescan()\">"
 		"Rescan library</button></div>",
-		GETFLAG(SCANNING_MASK) || GETFLAG(RESCAN_MASK) ?
-			"Scan in progress" : "Library is up to date",
+		scanning ? "Scan in progress" : "Library is up to date",
 		webui_relative_time(last_scan));
 
 	strcatf(&str,
@@ -244,14 +244,22 @@ webui_send_status(struct upnphttp * h)
 		"apply(this.getAttribute('data-t'));});}"
 		"apply(saved);"
 		"})();"
+		/* While a scan is running, poll fast so the page catches the
+		 * moment it finishes without the person needing to refresh
+		 * manually. Once idle, fall back to a slow background poll so
+		 * changes made by someone else (or by inotify) still show up
+		 * eventually without any action at all. */
+		"var scanning=%s;"
+		"setTimeout(function(){location.reload();},scanning?1500:15000);"
 		"function triggerRescan(){"
 		"var btn=document.getElementById('rescan-btn');"
 		"btn.disabled=true;btn.textContent='Rescanning...';"
 		"fetch('/rescan').then(function(){"
-		"setTimeout(function(){location.reload();},2000);"
+		"setTimeout(function(){location.reload();},500);"
 		"}).catch(function(){"
 		"btn.disabled=false;btn.textContent='Rescan library';});}"
-		"</script></body></html>");
+		"</script></body></html>",
+		scanning ? "true" : "false");
 
 	BuildResp_upnphttp(h, str.data, str.off);
 	SendResp_upnphttp(h);
