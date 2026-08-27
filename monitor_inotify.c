@@ -315,6 +315,12 @@ inotify_thread(void *arg)
 			buffer[BUF_LEN-1] = '\0';
 		}
 
+		if (GETFLAG(RESCAN_MASK))
+		{
+			DPRINTF(E_WARN, L_INOTIFY, "Ignoring inotify during rescan.\n");
+			continue;
+		}
+
 		i = 0;
 		while( !quitting && i < length )
 		{
@@ -328,6 +334,7 @@ inotify_thread(void *arg)
 				}
 				esc_name = modifyString(strdup(event->name), "&", "&amp;amp;", 0);
 				snprintf(path_buf, sizeof(path_buf), "%s/%s", get_path_from_wd(event->wd), event->name);
+				SETFLAG(MONITOR_MASK);
 				if ( event->mask & IN_ISDIR && (event->mask & (IN_CREATE|IN_MOVED_TO)) )
 				{
 					DPRINTF(E_DEBUG, L_INOTIFY,  "The directory %s was %s.\n",
@@ -377,6 +384,7 @@ inotify_thread(void *arg)
 						monitor_remove_tree(path_buf);
 					}
 				}
+				CLEARFLAG(MONITOR_MASK);
 				free(esc_name);
 			}
 			i += EVENT_SIZE + event->len;

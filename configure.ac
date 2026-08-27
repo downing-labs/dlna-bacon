@@ -26,10 +26,13 @@ m4_ifdef([AC_USE_SYSTEM_EXTENSIONS], [AC_USE_SYSTEM_EXTENSIONS])
 
 #MiniDLNA
 
-AM_ICONV
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION(0.18)
-AM_GNU_GETTEXT_REQUIRE_VERSION(0.18)
+# Gettext/po translation support (and AM_ICONV, which depended on the
+# same gettext auxiliary files) intentionally removed for DLNA Bacon:
+# the upstream po/Makefile.in.in regeneration via autopoint is broken
+# against this configure.ac when building from a raw git checkout with
+# modern gettext (a long-standing, well-documented upstream autotools
+# quirk, not something specific to our changes), and we don't need
+# translated UI strings for this fork.
 
 # Checks for programs.
 AC_PROG_AWK
@@ -40,11 +43,11 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 # Default string definitions
-AC_DEFINE_UNQUOTED([OS_URL],"http://sourceforge.net/projects/minidlna/",[OS URL])
+AC_DEFINE_UNQUOTED([OS_URL],"https://github.com/downing-labs/dlna-bacon",[OS URL])
 AC_DEFINE_UNQUOTED([ROOTDEV_MANUFACTURER],"Justin Maggard", [Manufacturer])
 AC_DEFINE_UNQUOTED([ROOTDEV_MANUFACTURERURL],"http://www.netgear.com/", [Manufacturer URL])
-AC_DEFINE_UNQUOTED([ROOTDEV_MODELNAME],"Windows Media Connect compatible (MiniDLNA)", [Model name])
-AC_DEFINE_UNQUOTED([ROOTDEV_MODELDESCRIPTION],"MiniDLNA on " OS_NAME, [Model description])
+AC_DEFINE_UNQUOTED([ROOTDEV_MODELNAME],"Windows Media Connect compatible (DLNA Bacon)", [Model name])
+AC_DEFINE_UNQUOTED([ROOTDEV_MODELDESCRIPTION],"DLNA Bacon on " OS_NAME, [Model description])
 AC_DEFINE_UNQUOTED([ROOTDEV_MODELURL],OS_URL,[Model URL])
 
 
@@ -670,6 +673,5 @@ case "$target_os" in
 esac
 
 
-AC_OUTPUT([ po/Makefile.in
-Makefile
+AC_OUTPUT([ Makefile
 ])

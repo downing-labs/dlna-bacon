@@ -17,7 +17,7 @@
 
 AM_CFLAGS = -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 
-SUBDIRS=po
+# po/ (gettext translations) intentionally not built -- see configure.ac
 
 sbin_PROGRAMS = minidlnad
 check_PROGRAMS = testupnpdescgen
@@ -28,7 +28,7 @@ minidlnad_SOURCES = minidlna.c upnphttp.c upnpdescgen.c upnpsoap.c \
 			sql.c utils.c metadata.c scanner.c monitor.c \
 			tivo_utils.c tivo_beacon.c tivo_commands.c \
 			playlist.c image_utils.c albumart.c log.c \
-			containers.c avahi.c tagutils/tagutils.c
+			containers.c avahi.c webui.c tagutils/tagutils.c
 
 if HAVE_KQUEUE
 minidlnad_SOURCES += kqueue.c monitor_kqueue.c
@@ -60,8 +60,6 @@ minidlnad_LDADD = \
 	@LIBSQLITE3_LIBS@ \
 	@LIBAVFORMAT_LIBS@ \
 	@LIBEXIF_LIBS@ \
-	@LIBINTL@ \
-	@LIBICONV@ \
 	-lFLAC $(flacogglibs) $(vorbislibs) $(avahilibs)
 
 testupnpdescgen_SOURCES = testupnpdescgen.c upnpdescgen.c

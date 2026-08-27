@@ -62,7 +62,7 @@
 #ifdef NETGEAR
 # define SERVER_NAME "ReadyDLNA"
 #else
-# define SERVER_NAME "MiniDLNA"
+# define SERVER_NAME "DLNA Bacon"
 #endif
 
 #define USE_FORK 1
@@ -190,7 +190,7 @@ extern time_t startup_time;
 
 extern struct runtime_vars_s runtime_vars;
 /* runtime boolean flags */
-extern uint32_t runtime_flags;
+extern volatile uint32_t runtime_flags;
 #define INOTIFY_MASK          0x0001
 #define TIVO_MASK             0x0002
 #define DLNA_STRICT_MASK      0x0004
@@ -207,6 +207,7 @@ extern uint32_t runtime_flags;
 #define RESCAN_MASK           0x0200
 #define SUBTITLES_MASK        0x0400
 #define FORCE_ALPHASORT_MASK  0x0800
+#define MONITOR_MASK          0x1000
 
 #define SETFLAG(mask)	runtime_flags |= mask
 #define GETFLAG(mask)	(runtime_flags & mask)

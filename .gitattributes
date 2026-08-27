@@ -1,0 +1,9 @@
+* text=auto eol=lf
+*.sh text eol=lf
+configure text eol=lf
+install-sh text eol=lf
+config.guess text eol=lf
+config.sub text eol=lf
+compile text eol=lf
+depcomp text eol=lf
+missing text eol=lf
