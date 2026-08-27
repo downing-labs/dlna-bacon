@@ -18,18 +18,18 @@ This is an independent fork, not affiliated with or endorsed by the ReadyMedia/M
 
 ## Quick start
 
-Two ways to get the image — pull the prebuilt one, or build from source. Same `docker-compose.yml` either way; only the `image:` line changes.
+Three ways to get the image. Same `docker-compose.yml` either way; only the `image:` line changes.
 
-**Path A — pull from Docker Hub** (fastest, no build step):
+**Path A — pull from GitHub Container Registry** (recommended, no build step):
 ```yaml
 services:
   minidlna:
-    image: damon1974/dlna-bacon:latest
+    image: ghcr.io/downing-labs/dlna-bacon:latest
     container_name: minidlna
     network_mode: host
     environment:
       - MINIDLNA_MEDIA_DIR=V,/media
-      - MINIDLNA_FRIENDLY_NAME=STREAMY
+      - MINIDLNA_FRIENDLY_NAME=<DLNA SERVER NAME>
       - MINIDLNA_PORT=8200
       - MINIDLNA_INOTIFY=yes
       - MINIDLNA_ROOT_CONTAINER=B
@@ -43,7 +43,13 @@ services:
 docker compose pull && docker compose up -d
 ```
 
-**Path B — build from source** (no Docker Hub dependency, always matches this repo exactly):
+**Path B — pull from Docker Hub** (same image, alternate registry):
+```yaml
+    image: damon1974/dlna-bacon:latest
+```
+(swap that one line into the compose file above, everything else stays the same)
+
+**Path C — build from source** (no registry dependency, always matches this repo exactly):
 ```
 docker build -t dlna-bacon:latest https://github.com/downing-labs/dlna-bacon.git
 ```
