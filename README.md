@@ -24,9 +24,9 @@ Three ways to get the image. Same `docker-compose.yml` either way; only the `ima
 **Path A — pull from GitHub Container Registry** (recommended, no build step):
 ```yaml
 services:
-  minidlna:
+  dlna-bacon:
     image: ghcr.io/downing-labs/dlna-bacon:latest
-    container_name: minidlna
+    container_name: dlna-bacon
     network_mode: host
     environment:
       - MINIDLNA_MEDIA_DIR=V,/media
