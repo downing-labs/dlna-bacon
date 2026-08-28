@@ -34,7 +34,7 @@ Three ways to get the image. Same `docker-compose.yml` either way; only the `ima
    mkdir -p /opt/containers/dlna-bacon
    cd /opt/containers/dlna-bacon
    ```
-2. Create `docker-compose.yml` and paste in the config below -- `nano docker-compose.yml`, paste, save and exit (`Ctrl+O` then `Ctrl+X` in nano; `:wq` in vi):
+2. Open an editor -- `nano docker-compose.yml` or `vi docker-compose.yml` -- paste in the config below, and edit the two placeholders before saving: `/path/to/media` for your real media folder, and `<DLNA SERVER NAME>` for whatever name you want DLNA clients to see.
    ```yaml
    services:
      dlna-bacon:
@@ -53,26 +53,79 @@ Three ways to get the image. Same `docker-compose.yml` either way; only the `ima
          - ./cache:/minidlna/cache
        restart: unless-stopped
    ```
-3. Edit the two placeholders: `/path/to/media` for your real media folder, and `<DLNA SERVER NAME>` for whatever name you want DLNA clients to see.
+3. Save and exit: `Ctrl+O` then `Ctrl+X` in nano; `:wq` in vi.
 4. Pull and start it:
    ```
    docker compose pull && docker compose up -d
    ```
 
-**Path B — pull from Docker Hub** (same image, alternate registry): follow Path A exactly, just swap the `image:` line for:
-```yaml
-    image: damon1974/dlna-bacon:latest
-```
+**Path B — pull from Docker Hub** (same image, alternate registry):
+
+1. On that machine, go to (or create) wherever you keep container configs, e.g.:
+   ```
+   mkdir -p /opt/containers/dlna-bacon
+   cd /opt/containers/dlna-bacon
+   ```
+2. Open an editor -- `nano docker-compose.yml` or `vi docker-compose.yml` -- paste in the config below, and edit the two placeholders before saving: `/path/to/media` for your real media folder, and `<DLNA SERVER NAME>` for whatever name you want DLNA clients to see.
+   ```yaml
+   services:
+     dlna-bacon:
+       image: damon1974/dlna-bacon:latest
+       container_name: dlna-bacon
+       network_mode: host
+       environment:
+         - MINIDLNA_MEDIA_DIR=V,/media
+         - MINIDLNA_FRIENDLY_NAME=<DLNA SERVER NAME>
+         - MINIDLNA_PORT=8200
+         - MINIDLNA_INOTIFY=yes
+         - MINIDLNA_ROOT_CONTAINER=B
+         - MINIDLNA_NETWORK_INTERFACE=eth0
+       volumes:
+         - /path/to/media:/media:ro
+         - ./cache:/minidlna/cache
+       restart: unless-stopped
+   ```
+3. Save and exit: `Ctrl+O` then `Ctrl+X` in nano; `:wq` in vi.
+4. Pull and start it:
+   ```
+   docker compose pull && docker compose up -d
+   ```
 
 **Path C — build the image yourself from source** (still uses Docker -- this builds the image from this repo instead of pulling a prebuilt one; no registry dependency, always matches this repo exactly):
 
-1. `cd` into the same directory as Path A step 1.
-2. Build it:
+1. On that machine, go to (or create) wherever you keep container configs, e.g.:
+   ```
+   mkdir -p /opt/containers/dlna-bacon
+   cd /opt/containers/dlna-bacon
+   ```
+2. Build the image:
    ```
    docker build -t dlna-bacon:latest https://github.com/downing-labs/dlna-bacon.git
    ```
-3. Create `docker-compose.yml` the same way as Path A, but set `image: dlna-bacon:latest` (the tag you just built) instead of a registry image.
-4. `docker compose up -d` (no `pull` needed -- the image's already local).
+3. Open an editor -- `nano docker-compose.yml` or `vi docker-compose.yml` -- paste in the config below, and edit the two placeholders before saving: `/path/to/media` for your real media folder, and `<DLNA SERVER NAME>` for whatever name you want DLNA clients to see.
+   ```yaml
+   services:
+     dlna-bacon:
+       image: dlna-bacon:latest
+       container_name: dlna-bacon
+       network_mode: host
+       environment:
+         - MINIDLNA_MEDIA_DIR=V,/media
+         - MINIDLNA_FRIENDLY_NAME=<DLNA SERVER NAME>
+         - MINIDLNA_PORT=8200
+         - MINIDLNA_INOTIFY=yes
+         - MINIDLNA_ROOT_CONTAINER=B
+         - MINIDLNA_NETWORK_INTERFACE=eth0
+       volumes:
+         - /path/to/media:/media:ro
+         - ./cache:/minidlna/cache
+       restart: unless-stopped
+   ```
+4. Save and exit: `Ctrl+O` then `Ctrl+X` in nano; `:wq` in vi.
+5. Start it (no `pull` needed -- the image you built is already local):
+   ```
+   docker compose up -d
+   ```
 
 Either way: visit `http://<host-ip>:8200/status` (use an IP, not `localhost` -- see [Notes](#notes) below). Click **Rescan library** any time you add new files.
 
