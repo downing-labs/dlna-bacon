@@ -17,6 +17,10 @@ Like upstream, this is licensed under **GPLv2**. Original code and copyright: Ju
 
 This is an independent fork, not affiliated with or endorsed by the ReadyMedia/MiniDLNA project.
 
+## Before you start
+
+This container runs the DLNA/UPnP-AV *server* — it doesn't configure your network or your playback devices. Your TV, game console, or media player still needs DLNA support turned on and able to discover this server, and some routers/firewalls block the multicast traffic DLNA discovery relies on unless UPnP/SSDP is explicitly allowed on that network segment. The [environment variables table below](#environment-variables) covers everything this image exposes; the full underlying option set -- including anything not yet wired up as an env var here -- is documented in `upstream/minidlna.conf.5`, a standard Unix man page (view it with `man upstream/minidlna.conf.5` after cloning; GitHub shows the raw markup, not the formatted version). For general DLNA client/network troubleshooting beyond what this image controls, the [ArchWiki MiniDLNA page](https://wiki.archlinux.org/title/MiniDLNA) is a solid, actively-maintained community reference (upstream has since renamed to ReadyMedia, but "MiniDLNA" is still how most third-party documentation and search results refer to it).
+
 ## Quick start
 
 Three ways to get the image. Same `docker-compose.yml` either way; only the `image:` line changes.
