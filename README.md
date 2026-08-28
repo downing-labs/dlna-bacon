@@ -23,11 +23,11 @@ This container runs the DLNA/UPnP-AV *server* — it doesn't configure your netw
 
 ## Quick start
 
-**Prerequisite:** Docker with the Compose plugin installed on the machine that will run this (check with `docker compose version` -- the older standalone `docker-compose` script works too, just swap the space for a hyphen in the commands below). All three paths below need Docker; see the [native build note](#running-without-docker) at the end of this section if you'd rather not use it at all.
+**Prerequisite:** Docker with the Compose plugin installed on the machine that will run this (check with `docker compose version` -- the older standalone `docker-compose` script works too, just swap the space for a hyphen in the commands below). Both paths below need Docker; see the [native build note](#running-without-docker) at the end of this section if you'd rather not use it at all.
 
-Three ways to get the image. Same `docker-compose.yml` either way; only the `image:` line changes.
+Two ways to get the image: pull a prebuilt one (recommended), or build it yourself from this repo.
 
-**Path A — pull from GitHub Container Registry** (recommended, no build step):
+**Path A — pull a prebuilt image** (no build step):
 
 1. On that machine, go to (or create) wherever you keep container configs, e.g.:
    ```
@@ -53,37 +53,9 @@ Three ways to get the image. Same `docker-compose.yml` either way; only the `ima
          - ./cache:/minidlna/cache
        restart: unless-stopped
    ```
-3. Save and exit: `Ctrl+O` then `Ctrl+X` in nano; `:wq` in vi.
-4. Pull and start it:
-   ```
-   docker compose pull && docker compose up -d
-   ```
-
-**Path B — pull from Docker Hub** (same image, alternate registry):
-
-1. On that machine, go to (or create) wherever you keep container configs, e.g.:
-   ```
-   mkdir -p /opt/containers/dlna-bacon
-   cd /opt/containers/dlna-bacon
-   ```
-2. Open an editor -- `nano docker-compose.yml` or `vi docker-compose.yml` -- paste in the config below, and edit the two placeholders before saving: `/path/to/media` for your real media folder, and `<DLNA SERVER NAME>` for whatever name you want DLNA clients to see.
+   Prefer Docker Hub over GHCR? Same image, just a different registry -- use this `image:` line instead:
    ```yaml
-   services:
-     dlna-bacon:
        image: damon1974/dlna-bacon:latest
-       container_name: dlna-bacon
-       network_mode: host
-       environment:
-         - MINIDLNA_MEDIA_DIR=V,/media
-         - MINIDLNA_FRIENDLY_NAME=<DLNA SERVER NAME>
-         - MINIDLNA_PORT=8200
-         - MINIDLNA_INOTIFY=yes
-         - MINIDLNA_ROOT_CONTAINER=B
-         - MINIDLNA_NETWORK_INTERFACE=eth0
-       volumes:
-         - /path/to/media:/media:ro
-         - ./cache:/minidlna/cache
-       restart: unless-stopped
    ```
 3. Save and exit: `Ctrl+O` then `Ctrl+X` in nano; `:wq` in vi.
 4. Pull and start it:
@@ -91,7 +63,7 @@ Three ways to get the image. Same `docker-compose.yml` either way; only the `ima
    docker compose pull && docker compose up -d
    ```
 
-**Path C — build the image yourself from source** (still uses Docker -- this builds the image from this repo instead of pulling a prebuilt one; no registry dependency, always matches this repo exactly):
+**Path B — build the image yourself from source** (still uses Docker -- this builds the image from this repo instead of pulling a prebuilt one; no registry dependency, always matches this repo exactly):
 
 1. On that machine, go to (or create) wherever you keep container configs, e.g.:
    ```
@@ -131,7 +103,7 @@ Either way: visit `http://<host-ip>:8200/status` (use an IP, not `localhost` -- 
 
 ### Running without Docker
 
-The daemon itself doesn't require Docker -- it's a standard autotools C project, and `./autogen.sh && ./configure && make` (see [Building from source](#building-from-source) below) produces a working `minidlnad` binary on any Linux box with the right dependencies installed, no container involved. What Docker actually buys you here is `entrypoint.sh`: the environment-variable-driven config generation, automatic `PUID`/`PGID` handling, and healthcheck that Paths A-C all rely on. Running natively means writing your own `minidlna.conf` by hand (see `upstream/minidlna.conf.5`) and managing the process yourself -- a starting init script template is at `src/linux/minidlna.init.d.script.tmpl`. This isn't a path we've packaged or documented step-by-step, since our own use case is entirely container-based, but nothing about the daemon itself locks you into Docker.
+The daemon itself doesn't require Docker -- it's a standard autotools C project, and `./autogen.sh && ./configure && make` (see [Building from source](#building-from-source) below) produces a working `minidlnad` binary on any Linux box with the right dependencies installed, no container involved. What Docker actually buys you here is `entrypoint.sh`: the environment-variable-driven config generation, automatic `PUID`/`PGID` handling, and healthcheck that Paths A-B both rely on. Running natively means writing your own `minidlna.conf` by hand (see `upstream/minidlna.conf.5`) and managing the process yourself -- a starting init script template is at `src/linux/minidlna.init.d.script.tmpl`. This isn't a path we've packaged or documented step-by-step, since our own use case is entirely container-based, but nothing about the daemon itself locks you into Docker.
 
 ## Building from source
 
