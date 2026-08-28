@@ -23,44 +23,62 @@ This container runs the DLNA/UPnP-AV *server* — it doesn't configure your netw
 
 ## Quick start
 
+**Prerequisite:** Docker with the Compose plugin installed on the machine that will run this (check with `docker compose version` -- the older standalone `docker-compose` script works too, just swap the space for a hyphen in the commands below). All three paths below need Docker; see the [native build note](#running-without-docker) at the end of this section if you'd rather not use it at all.
+
 Three ways to get the image. Same `docker-compose.yml` either way; only the `image:` line changes.
 
 **Path A — pull from GitHub Container Registry** (recommended, no build step):
-```yaml
-services:
-  dlna-bacon:
-    image: ghcr.io/downing-labs/dlna-bacon:latest
-    container_name: dlna-bacon
-    network_mode: host
-    environment:
-      - MINIDLNA_MEDIA_DIR=V,/media
-      - MINIDLNA_FRIENDLY_NAME=<DLNA SERVER NAME>
-      - MINIDLNA_PORT=8200
-      - MINIDLNA_INOTIFY=yes
-      - MINIDLNA_ROOT_CONTAINER=B
-      - MINIDLNA_NETWORK_INTERFACE=eth0
-    volumes:
-      - /path/to/media:/media:ro
-      - ./cache:/minidlna/cache
-    restart: unless-stopped
-```
-```
-docker compose pull && docker compose up -d
-```
 
-**Path B — pull from Docker Hub** (same image, alternate registry):
+1. On that machine, go to (or create) wherever you keep container configs, e.g.:
+   ```
+   mkdir -p /opt/containers/dlna-bacon
+   cd /opt/containers/dlna-bacon
+   ```
+2. Create `docker-compose.yml` and paste in the config below -- `nano docker-compose.yml`, paste, save and exit (`Ctrl+O` then `Ctrl+X` in nano; `:wq` in vi):
+   ```yaml
+   services:
+     dlna-bacon:
+       image: ghcr.io/downing-labs/dlna-bacon:latest
+       container_name: dlna-bacon
+       network_mode: host
+       environment:
+         - MINIDLNA_MEDIA_DIR=V,/media
+         - MINIDLNA_FRIENDLY_NAME=<DLNA SERVER NAME>
+         - MINIDLNA_PORT=8200
+         - MINIDLNA_INOTIFY=yes
+         - MINIDLNA_ROOT_CONTAINER=B
+         - MINIDLNA_NETWORK_INTERFACE=eth0
+       volumes:
+         - /path/to/media:/media:ro
+         - ./cache:/minidlna/cache
+       restart: unless-stopped
+   ```
+3. Edit the two placeholders: `/path/to/media` for your real media folder, and `<DLNA SERVER NAME>` for whatever name you want DLNA clients to see.
+4. Pull and start it:
+   ```
+   docker compose pull && docker compose up -d
+   ```
+
+**Path B — pull from Docker Hub** (same image, alternate registry): follow Path A exactly, just swap the `image:` line for:
 ```yaml
     image: damon1974/dlna-bacon:latest
 ```
-(swap that one line into the compose file above, everything else stays the same)
 
-**Path C — build from source** (no registry dependency, always matches this repo exactly):
-```
-docker build -t dlna-bacon:latest https://github.com/downing-labs/dlna-bacon.git
-```
-then use `image: dlna-bacon:latest` in the compose file above instead.
+**Path C — build the image yourself from source** (still uses Docker -- this builds the image from this repo instead of pulling a prebuilt one; no registry dependency, always matches this repo exactly):
+
+1. `cd` into the same directory as Path A step 1.
+2. Build it:
+   ```
+   docker build -t dlna-bacon:latest https://github.com/downing-labs/dlna-bacon.git
+   ```
+3. Create `docker-compose.yml` the same way as Path A, but set `image: dlna-bacon:latest` (the tag you just built) instead of a registry image.
+4. `docker compose up -d` (no `pull` needed -- the image's already local).
 
 Either way: visit `http://<host-ip>:8200/status` (use an IP, not `localhost` -- see [Notes](#notes) below). Click **Rescan library** any time you add new files.
+
+### Running without Docker
+
+The daemon itself doesn't require Docker -- it's a standard autotools C project, and `./autogen.sh && ./configure && make` (see [Building from source](#building-from-source) below) produces a working `minidlnad` binary on any Linux box with the right dependencies installed, no container involved. What Docker actually buys you here is `entrypoint.sh`: the environment-variable-driven config generation, automatic `PUID`/`PGID` handling, and healthcheck that Paths A-C all rely on. Running natively means writing your own `minidlna.conf` by hand (see `upstream/minidlna.conf.5`) and managing the process yourself -- a starting init script template is at `src/linux/minidlna.init.d.script.tmpl`. This isn't a path we've packaged or documented step-by-step, since our own use case is entirely container-based, but nothing about the daemon itself locks you into Docker.
 
 ## Building from source
 
